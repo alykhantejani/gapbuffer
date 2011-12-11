@@ -161,6 +161,12 @@ class InsertTests(unittest.TestCase):
         self.gapbuffer.moveCursorBackward(2)
         self.gapbuffer.insert('b')
         self.assertEqual("abcd", self.gapbuffer.getText())
+        
+    def testInsertAtStartOfBufferAfterMovingCursor(self):
+        self.gapbuffer.insert("bcd")
+        self.gapbuffer.moveCursorBackward(3)
+        self.gapbuffer.insert('a')
+        self.assertEqual("abcd", self.gapbuffer.getText())
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testInsert']
