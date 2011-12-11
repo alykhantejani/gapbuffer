@@ -16,27 +16,11 @@ class CursorMovementTests(unittest.TestCase):
     def testCursorPositionWithNewBufferIsZero(self):
         self.assertEqual(0,self.gapbuffer.getCursorPosition())
     
-    def testCursorCantBeMovedForwardEmptyBuffer(self):
+    def testCursorCantBeMovedForwardWithEmptyBuffer(self):
         self.assertFalse(self.gapbuffer.cursorCanMoveForward())
     
-    def testCursorCantBeMovedBackwardEmptyBuffer(self):
+    def testCursorCantBeMovedBackwardWithEmptyBuffer(self):
         self.assertFalse(self.gapbuffer.cursorCanMoveBackward())
-    
-    def testCursorHasCorrectPositionAfterInsert(self):
-        self.assertEqual(0, self.gapbuffer.getCursorPosition())
-        self.gapbuffer.insert('a')
-        self.assertEqual(1, self.gapbuffer.getCursorPosition())
-    
-    def testCursorHasCorrectPositionAfterMultipleInserts(self):
-        self.assertEqual(0, self.gapbuffer.getCursorPosition())
-        self.gapbuffer.insert('a')
-        self.gapbuffer.insert('b')
-        self.assertEqual(2, self.gapbuffer.getCursorPosition())
-    
-    def testCursorHasCorrectPositionAfterMultiCharacterStringInsert(self):
-        self.assertEqual(0, self.gapbuffer.getCursorPosition())
-        self.gapbuffer.insert("abc")
-        self.assertEqual(3, self.gapbuffer.getCursorPosition())
     
     def testCursorCantBeMovedForwardOnceWithEmtpyBuffer(self):
         self.assertRaises(CursorOutOfBoundsException, self.gapbuffer.moveCursorForward)
@@ -65,7 +49,7 @@ class CursorMovementTests(unittest.TestCase):
         self.gapbuffer.moveCursorBackward()
         self.assertEqual(0, self.gapbuffer.getCursorPosition())
         
-    def testMovingCursorBackwardsMoreThanOnePosition(self):
+    def testMovingCursorBackwardsMoreThanOnePositionAfterInsert(self):
         self.gapbuffer.insert("abc")
         self.assertEqual(3, self.gapbuffer.getCursorPosition())
         self.gapbuffer.moveCursorBackward(2)
@@ -73,13 +57,23 @@ class CursorMovementTests(unittest.TestCase):
         self.gapbuffer.moveCursorBackward(1)
         self.assertEqual(0, self.gapbuffer.getCursorPosition())
     
-    def testMovingCursorForwardOnce(self):
+    def testCursorCantBeMovedForwardAfterOnlyInserts(self):
+        self.gapbuffer = GapBuffer(4)
+        self.gapbuffer.insert('a')
+        self.assertFalse(self.gapbuffer.cursorCanMoveForward())
+
+    def testCursorCantBeMovedForwardAfterOnlyInsertsInIncorrectlySizedBuffer(self):
+        self.gapbuffer = GapBuffer(2)
+        self.gapbuffer.insert("abc")
+        self.assertFalse(self.gapbuffer.cursorCanMoveForward())
+
+    def testMovingCursorForwardOnceAfterInsertAndMovingBackward(self):
         self.gapbuffer.insert('a')
         self.gapbuffer.moveCursorBackward()
         self.gapbuffer.moveCursorForward()
         self.assertEqual(1, self.gapbuffer.getCursorPosition())
     
-    def testMovingCursorForwardsMoreThanOnePosition(self):
+    def testMovingCursorForwardsMoreThanOnePositionAfterInsertsAndMovingBackwards(self):
         self.gapbuffer.insert("abc")
         self.gapbuffer.moveCursorBackward(3)
         self.gapbuffer.moveCursorForward(2)
@@ -145,6 +139,28 @@ class InsertTests(unittest.TestCase):
         self.gapbuffer = GapBuffer(2)
         self.gapbuffer.insert("hell\no")
         self.assertEqual("hell\no", self.gapbuffer.getText())
+
+    def testCursorHasCorrectPositionAfterInsert(self):
+        self.assertEqual(0, self.gapbuffer.getCursorPosition())
+        self.gapbuffer.insert('a')
+        self.assertEqual(1, self.gapbuffer.getCursorPosition())
+    
+    def testCursorHasCorrectPositionAfterMultipleInserts(self):
+        self.assertEqual(0, self.gapbuffer.getCursorPosition())
+        self.gapbuffer.insert('a')
+        self.gapbuffer.insert('b')
+        self.assertEqual(2, self.gapbuffer.getCursorPosition())
+    
+    def testCursorHasCorrectPositionAfterMultiCharacterStringInsert(self):
+        self.assertEqual(0, self.gapbuffer.getCursorPosition())
+        self.gapbuffer.insert("abc")
+        self.assertEqual(3, self.gapbuffer.getCursorPosition())
+
+    def testInsertInMiddleOfBufferAfterMovingCursor(self):
+        self.gapbuffer.insert("acd")
+        self.gapbuffer.moveCursorBackward(2)
+        self.gapbuffer.insert('b')
+        self.assertEqual("abcd", self.gapbuffer.getText())
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testInsert']

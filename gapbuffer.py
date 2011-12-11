@@ -56,7 +56,7 @@ class GapBuffer(object):
             self.__gapend -= 1
             self.__gapstart = new_gapstart
         else:
-            raise CursorOutOfBoundsException("Cursor already at end of buffer")
+            raise CursorOutOfBoundsException("Cursor already at start of buffer")
         
     def getText(self):
         bob = []
@@ -70,9 +70,8 @@ class GapBuffer(object):
         for character in text:
             self.__insert_single_character(character)
     
-    
     def __insert_single_character(self, character):
-        if self.__has_gap_space_left():
+        if not self.__has_gap_space_left():
             self.__increase_buffer_size()
         self.__buffer[self.__gapstart] = character
         self.__gapstart += 1
@@ -82,8 +81,9 @@ class GapBuffer(object):
         extension_array = array(self.CHAR_TYPE, self.NULL_CHAR * increase_size)
         j = -1
         elements_transferred = 0
-        for i in range(len(self.__buffer) - 1, self.__gapend - 1, -1):
-            extension_array[j] = self.__buffer[i]
+
+        for idx in range(len(self.__buffer) - 1, self.__gapend, -1):
+            extension_array[j] = self.__buffer[idx]
             j -= 1
             elements_transferred += 1
         
