@@ -19,7 +19,7 @@ class GapBuffer(object):
     CHAR_TYPE = 'u'
     
     def __init__(self, size = 2):
-        self.__buffer = array(self.CHAR_TYPE,self.NULL_CHAR * size)
+        self.__buffer = [self.NULL_CHAR for x in range(0,size)]
         self.__gapstart = 0
         self.__gapend = size - 1  
     
@@ -78,17 +78,17 @@ class GapBuffer(object):
         
     def _increase_buffer_size(self):
         increase_size = len(self.__buffer)
-        extension_array = array(self.CHAR_TYPE, self.NULL_CHAR * increase_size)
+        extension_list = [ self.NULL_CHAR for x in range(0, increase_size) ]
         j = -1
         elements_transferred = 0
 
         for idx in range(len(self.__buffer) - 1, self.__gapend, -1):
-            extension_array[j] = self.__buffer[idx]
+            extension_list[j] = self.__buffer[idx]
             j -= 1
             elements_transferred += 1
         
-        self.__gapend = len(self.__buffer) + len(extension_array) + j
-        self.__buffer.extend(extension_array)
+        self.__gapend = len(self.__buffer) + len(extension_list) + j
+        self.__buffer.extend(extension_list)
 
     def _has_gap_space_left(self):
         return self.__gapstart <= self.__gapend
