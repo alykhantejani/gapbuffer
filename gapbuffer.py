@@ -23,21 +23,21 @@ class GapBuffer(object):
         self.__gapstart = 0
         self.__gapend = size - 1  
     
-    def cursorCanMoveForward(self):
+    def cursor_can_move_forward(self):
         return self.__gapend + 1 < len(self.__buffer)
 
-    def cursorCanMoveBackward(self):
+    def cursor_can_move_backward(self):
         return self.__gapstart - 1 >= 0
         
-    def getCursorPosition(self):
+    def get_cursor_position(self):
         return self.__gapstart
     
-    def moveCursorForward(self, distance = 1):        
+    def move_cursor_forward(self, distance = 1):        
         for i in range(0, distance):#@UnusedVariable 
-            self.__moveCursorForwardByOne()
+            self._move_cursor_forward_by_one()
     
-    def __moveCursorForwardByOne(self):
-        if self.cursorCanMoveForward():
+    def _move_cursor_forward_by_one(self):
+        if self.cursor_can_move_forward():
             new_gapend = self.__gapend + 1
             self.__buffer[self.__gapstart] = self.__buffer[new_gapend]
             self.__gapstart += 1
@@ -45,12 +45,12 @@ class GapBuffer(object):
         else:
             raise CursorOutOfBoundsException("Cursor already at end of buffer")
     
-    def moveCursorBackward(self, distance = 1):
+    def move_cursor_backward(self, distance = 1):
         for i in range(0, distance):#@UnusedVariable
-            self.__moveCursorBackwardByOne()
+            self._move_cursor_backward_by_one()
     
-    def __moveCursorBackwardByOne(self):
-        if self.cursorCanMoveBackward():
+    def _move_cursor_backward_by_one(self):
+        if self.cursor_can_move_backward():
             new_gapstart = self.__gapstart - 1
             self.__buffer[self.__gapend] = self.__buffer[new_gapstart]
             self.__gapend -= 1
@@ -58,7 +58,7 @@ class GapBuffer(object):
         else:
             raise CursorOutOfBoundsException("Cursor already at start of buffer")
         
-    def getText(self):
+    def get_text(self):
         bob = []
         for idx, char in enumerate(self.__buffer):
             if idx not in range(self.__gapstart, self.__gapend + 1) and char != self.NULL_CHAR:
@@ -68,15 +68,15 @@ class GapBuffer(object):
     
     def insert(self, text):
         for character in text:
-            self.__insert_single_character(character)
+            self._insert_single_character(character)
     
-    def __insert_single_character(self, character):
-        if not self.__has_gap_space_left():
-            self.__increase_buffer_size()
+    def _insert_single_character(self, character):
+        if not self._has_gap_space_left():
+            self._increase_buffer_size()
         self.__buffer[self.__gapstart] = character
         self.__gapstart += 1
         
-    def __increase_buffer_size(self):
+    def _increase_buffer_size(self):
         increase_size = len(self.__buffer)
         extension_array = array(self.CHAR_TYPE, self.NULL_CHAR * increase_size)
         j = -1
@@ -90,6 +90,12 @@ class GapBuffer(object):
         self.__gapend = len(self.__buffer) + len(extension_array) + j
         self.__buffer.extend(extension_array)
 
-    def __has_gap_space_left(self):
+    def _has_gap_space_left(self):
         return self.__gapstart <= self.__gapend
     
+    def delete(self):
+        if self._can_delete():
+            self.__gapstart -= 1
+
+    def _can_delete(self):
+        return self.__gapstart != 0
